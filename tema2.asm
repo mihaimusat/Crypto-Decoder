@@ -134,9 +134,118 @@ xor_hex_byte_by_byte:
 end_xor_hex_strings:
         leave 
         ret
-;===============================================================;  
+;===============================================================;
+
+base32_to_value: ; daca e litera scade din aceasta valoarea ascii a lui 'A'
+        push ebp ; daca e numar, scade '2' si aduna 26
+        mov ebp, esp
+        mov eax, [ebp + 8]
+        sub eax, '='
+        jz base32_to_value_exit ; daca este '=' se pune 0 in eax
+        mov eax, [ebp + 8]
+        cmp eax, 'A'
+        jl base32_to_value_number
+        sub eax, 'A'
+        jmp base32_to_value_exit
+base32_to_value_number:
+        sub eax, '2'
+        add eax, 26
+base32_to_value_exit: ; rezultatul este pus in eax
+        pop ebp
+        ret
+ 
 base32decode:
 	; TODO TASK 4
+	push ebp
+        mov ebp, esp
+        mov edi, [ebp + 8] ; parcurge stringul codat
+        mov esi, [ebp + 8] ; scrie stringul decodat cate un caracter
+        
+base32decode_iteration:
+        xor edx, edx
+        xor eax, eax
+        mov al, byte [edi] ; se ia primul caracter si se decodifica
+        push eax
+        call base32_to_value
+        add esp, 4
+        
+        mov dl, al ; in dl se construieste primul byte din numar
+        shl dl, 3  ; mai raman 3 biti de "umplut"
+        mov al, byte [edi + 1]
+        push eax
+        call base32_to_value
+        add esp, 4
+        
+        mov ah, al
+        shr al, 2     ; se pun doar 3/5 biti in dl pentru completare
+        or dl, al     ; acum primul byte este in dl
+        mov [esi], dl ; se scrie in esi pentru a se putea refolosi dl
+        inc esi
+        xor edx, edx
+        shl ah, 3 ; se sterg bitii care au fost folositi anterior
+        shr ah, 3
+        mov dl, ah  ; se pun cei 2 ramasi in dl urmand sa se construiasca
+        shl edx, 30 ; in edx restul de 4 bytes, adica 6 caractere din sir
+        xor eax, eax
+        mov al, byte [edi + 2]
+        push eax
+        call base32_to_value
+        add esp, 4
+        shl eax, 25 ; se shifteaza eax cu 30-5 biti
+        or edx, eax ; si se pune rezultatul in edx
+        
+        xor eax, eax
+        mov al, byte [edi + 3]
+        push eax
+        call base32_to_value
+        add esp, 4
+        shl eax, 20 ; se shifteaza eax cu 25-5 biti
+        or edx, eax
+        
+        xor eax, eax
+        mov al, byte [edi + 4]
+        push eax
+        call base32_to_value
+        add esp, 4
+        shl eax, 15 ; se shifteaza eax cu 20-5 biti
+        or edx, eax
+        
+        xor eax, eax
+        mov al, byte [edi + 5]
+        push eax
+        call base32_to_value
+        add esp, 4
+        shl eax, 10 ; se shifteaza eax cu 15-5 biti
+        or edx, eax
+        
+        xor eax, eax
+        mov al, byte [edi + 6]
+        push eax
+        call base32_to_value
+        add esp, 4
+        shl eax, 5 ; se shifteaza eax cu 10-5 biti
+        or edx, eax
+        
+        xor eax, eax
+        mov al, byte [edi + 7]
+        push eax
+        call base32_to_value
+        add esp, 4
+        or edx, eax ; nu mai este nevoie de shiftare
+        
+        mov byte [esi + 3], dl ; se scriu in sir caracterele in ordine inversa
+        mov byte [esi + 2], dh
+        shr edx, 16
+        mov byte [esi + 1], dl
+        mov byte [esi], dh
+        
+        add esi, 4 ; fiecare 8 caractere codificate reprezinta 5 bytes
+        add edi, 8 ; unul din ei fiind scris mai sus
+        cmp byte [edi], 0
+        jne base32decode_iteration
+                
+        mov byte [esi], 0
+        pop ebp
 	ret
 ;===============================================================;
 bruteforce_singlebyte_xor:
@@ -415,8 +524,12 @@ task4:
 	; TODO TASK 4: call the base32decode function
 	
 	push ecx
-	call puts         
-	add esp, 4
+        call base32decode ; se apeleaza functia de decodificare
+        add esp, 4
+        
+	push ecx
+	call puts ; se afiseaza sirul decodificat
+	pop ecx
 	
 	jmp task_done
 
