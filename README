@@ -1,7 +1,7 @@
 Musat Mihai-Robert 
 Grupa 323CB 
 
-=====================================================Tema2 IOCLA - CryptoFun=====================================================
+==================================================Tema2 IOCLA - CryptoFun==================================================
 
 	In rezolvarea temei, pentru a solutiona fiecare task in parte, am realizat pe langa implementarea functiilor prezente 
 in scheletul de cod si implementarea unor functii ajutatoare.
@@ -15,14 +15,16 @@ Daca am ajuns la sfarsitul sirului, inseamna ca trebuie sa ies din functie si fa
 cate un octet si aplic xor intre octetul curent si octetul anterior din mesaj pentru a obtine octetii criptati asa cum este descris in 
 enunt. La final, daca inca mai am octeti neexplorati fac salt neconditionat la rolling_xor_byte_by_byte pentru a repeta procesul.  
 	Pentru implementarea task-ului 3, am folosit mai multe label-uri ajutatoare: convert prin care fac conversia atat a mesajului, 
-cat si a cheii din hexazecimal in decimal, move prin care fac parcurgerea si impartirea in jumatate a sirului pe care vreau sa aplic xor deoarece asa cum arata in enunt se iau cate doi octeti.Atunci cand parcurg, daca in al e cifra sar la label-ul digit si daca nu, la 
+cat si a cheii din hexazecimal in decimal, move prin care fac parcurgerea si impartirea in jumatate a sirului pe care vreau sa aplic xor 
+deoarece asa cum arata in enunt se iau cate doi octeti.Atunci cand parcurg, daca in al e cifra sar la label-ul digit si daca nu, la 
 label-ul letter.In mod analog, fac acest salt si pentru ah folosind label-ul cmp_for_ah din care sar fie la digit2, fie la letter2 pentru 
 a face conversia din caracter in cifra, respectiv din caracter in litera.Label-ul repeat_process nu face altceva decat sa treaca mai 
 departe prin deplasarea pointerilor pe care i-am fixat in al si ah.In final, functia xor_hex_strings va avea aceeasi forma ca cea de la 
 task1.	
 	Pentru a realiza task-ul 4, deoarece codificarea de tip base32 lucreaza cu 5 bytes (40 biti) s-a ales ca
 decodificarea sa se faca 8-32, adica mai intai sa se construiasca primul byte si apoi restul 4.Deoarece fiecare 40 biti sunt reprezentati 
-prin 8 caractere pentru construirea primului byte se foloseste un caracter si 3 biti din al doilea, ceilalti 2 urmand sa fie pusi in alt registru.Celelalte 6 caractere sunt puse pe rand in acel registru urmand sa fie scris cu totul in sirul initial.Deoarece sirul codificat 
+prin 8 caractere pentru construirea primului byte se foloseste un caracter si 3 biti din al doilea, ceilalti 2 urmand sa fie pusi in alt registru.
+Celelalte 6 caractere sunt puse pe rand in acel registru urmand sa fie scris cu totul in sirul initial.Deoarece sirul codificat 
 este mai lung, la final se pune null unde se termina sirul. La fiecare parcurgere se citesc 8 caractere si se scriu 5.
 Se utilizeaza o functie ajutatoare care trece fiecare caracter din ASCII in echivalentul ca valoare base32.
 	Pentru a realiza task-ul 5, am implementat o multime de functii ajutatoare, dar care au la baza aceeasi idee: case_f, case_r, etc
